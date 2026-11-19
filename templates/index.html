@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titanic Survival Predictor</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; padding: 38px 18px;
+            font-family: Inter, Segoe UI, Arial, sans-serif;
+            color: #172033;
+            background: linear-gradient(135deg, #e8f0ff, #f7f9fc 55%, #e6f4f1);
+        }
+        .container {
+            width: min(760px, 100%); margin: auto; background: white;
+            border-radius: 20px; padding: 34px;
+            box-shadow: 0 18px 55px rgba(28, 48, 82, .12);
+        }
+        .eyebrow { color: #3974c6; font-size: 12px; font-weight: 800; letter-spacing: 2px; }
+        h1 { margin: 9px 0 8px; font-size: clamp(27px, 5vw, 36px); }
+        .subtitle { margin: 0 0 28px; color: #68758a; line-height: 1.6; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+        label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 700; color: #43516a; }
+        input, select {
+            width: 100%; height: 46px; border: 1px solid #dce3ed;
+            border-radius: 10px; padding: 0 12px; font-size: 15px;
+            background: #fbfcfe; color: #172033; outline: none;
+        }
+        input:focus, select:focus { border-color: #3974c6; box-shadow: 0 0 0 3px #3974c61c; }
+        .field { min-width: 0; }
+        button {
+            width: 100%; margin-top: 25px; height: 50px; border: 0;
+            border-radius: 11px; background: #2463b5; color: white;
+            font-size: 16px; font-weight: 750; cursor: pointer;
+        }
+        button:hover { background: #194f96; }
+        .result, .error {
+            margin-top: 22px; padding: 18px; border-radius: 12px;
+            text-align: center; line-height: 1.5;
+        }
+        .result { background: #edf8f1; color: #17633a; }
+        .result.no { background: #fff1f0; color: #a3342b; }
+        .error { background: #fff6e8; color: #87540b; }
+        .result strong { display: block; font-size: 22px; margin-bottom: 4px; }
+        .foot { text-align: center; color: #8993a4; font-size: 12px; margin-top: 23px; }
+        @media (max-width: 560px) {
+            .container { padding: 24px 18px; }
+            .grid { grid-template-columns: 1fr; gap: 14px; }
+        }
+    </style>
+</head>
+<body>
+<main class="container">
+    <div class="eyebrow">MACHINE LEARNING PROJECT</div>
+    <h1>Titanic Survival Predictor</h1>
+    <p class="subtitle">Enter passenger information to estimate the likelihood of survival.</p>
+
+    <form method="POST">
+        <div class="grid">
+            <div class="field">
+                <label for="name">Passenger name</label>
+                <input id="name" name="name" value="{{ form_data.name }}" required>
+            </div>
+            <div class="field">
+                <label for="pclass">Passenger class</label>
+                <select id="pclass" name="pclass">
+                    <option value="1" {% if form_data.pclass == "1" %}selected{% endif %}>1st Class</option>
+                    <option value="2" {% if form_data.pclass == "2" %}selected{% endif %}>2nd Class</option>
+                    <option value="3" {% if form_data.pclass == "3" %}selected{% endif %}>3rd Class</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex">
+                    <option value="male" {% if form_data.sex == "male" %}selected{% endif %}>Male</option>
+                    <option value="female" {% if form_data.sex == "female" %}selected{% endif %}>Female</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="age">Age</label>
+                <input id="age" type="number" name="age" min="0" max="100" step="0.1" value="{{ form_data.age }}" required>
+            </div>
+            <div class="field">
+                <label for="sibsp">Siblings / spouses aboard</label>
+                <input id="sibsp" type="number" name="sibsp" min="0" max="20" value="{{ form_data.sibsp }}" required>
+            </div>
+            <div class="field">
+                <label for="parch">Parents / children aboard</label>
+                <input id="parch" type="number" name="parch" min="0" max="20" value="{{ form_data.parch }}" required>
+            </div>
+            <div class="field">
+                <label for="fare">Ticket fare</label>
+                <input id="fare" type="number" name="fare" min="0" step="0.01" value="{{ form_data.fare }}" required>
+            </div>
+            <div class="field">
+                <label for="embarked">Port of embarkation</label>
+                <select id="embarked" name="embarked">
+                    <option value="S" {% if form_data.embarked == "S" %}selected{% endif %}>Southampton (S)</option>
+                    <option value="C" {% if form_data.embarked == "C" %}selected{% endif %}>Cherbourg (C)</option>
+                    <option value="Q" {% if form_data.embarked == "Q" %}selected{% endif %}>Queenstown (Q)</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit">Predict Survival</button>
+    </form>
+
+    {% if prediction %}
+        <section class="result {% if prediction == 'Did not survive' %}no{% endif %}">
+            <strong>{{ prediction }}</strong>
+            {% if probability is not none %}
+                Estimated survival probability: {{ probability }}%
+            {% endif %}
+        </section>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="foot">Built with Python · Flask · Scikit-learn</div>
+</main>
+</body>
+</html>
